@@ -66,9 +66,11 @@ pub fn service_call(id: u64, cmd: &Command) -> Value {
     }
 }
 
+// HA rejects a request whose id isn't higher than every id before it
+// (`id_reuse`), so these must follow the order they're sent in.
 const ID_GET_STATES: u64 = 1;
-const ID_SUBSCRIBE: u64 = 2;
-const ID_GET_CONFIG: u64 = 3;
+const ID_GET_CONFIG: u64 = 2;
+const ID_SUBSCRIBE: u64 = 3;
 /// To-do list subscriptions use ids TODO_BASE + index into `todos`.
 const TODO_BASE: u64 = 100;
 /// Service calls and pings start here, clear of the fixed ids above.

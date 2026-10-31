@@ -205,6 +205,7 @@ async fn connection(
     let mut state_sub: Option<u64> = None;
     let mut todo_sub: Option<u64> = None;
     let mut next_uid = 100u32;
+    let mut last_id = 0u64;
     let mut event_rx = events.subscribe();
 
     loop {
@@ -213,6 +214,15 @@ async fn connection(
                 let Some(Ok(Message::Text(text))) = incoming else { return Ok(()) };
                 let m: Value = serde_json::from_str(&text)?;
                 let id = m["id"].as_u64().unwrap_or(0);
+                // Like HA: every request id must be higher than the last one.
+                if authed {
+                    if id <= last_id {
+                        tx.send(msg(json!({"id": id, "type": "result", "success": false,
+                            "error": {"code": "id_reuse", "message": "Identifier values have to increase."}}))).await?;
+                        continue;
+                    }
+                    last_id = id;
+                }
                 match (authed, m["type"].as_str().unwrap_or("")) {
                     (false, "auth") if m["access_token"] == "dev" => {
                         authed = true;
