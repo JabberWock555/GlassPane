@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  server:
+    name: Rust (fmt, clippy, tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+
+  web:
+    name: Frontend (types, Chrome 57 build, dist up to date)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - run: npm run build
+      - name: web/dist must be committed after frontend changes
+        run: git diff --exit-code -- dist
+
+  e2e:
+    name: End-to-end against the mock Home Assistant
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: cargo build --bins
+      - name: Start mock HA and glasspane
+        run: |
+          ./target/debug/mock_ha > mock.log 2>&1 &
+          sleep 1
+          HA_TOKEN=dev ./target/debug/glasspane demo.toml > glasspane.log 2>&1 &
+          for i in $(seq 30); do curl -sf localhost:8090/api/info && break; sleep 1; done
+      - run: node tests/e2e.mjs
+      - if: failure()
+        run: cat mock.log glasspane.log

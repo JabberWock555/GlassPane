@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="theme-color" content="#12162a" />
+    <title>Home</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" href="data:," />
+    <!-- Splash styles are inline so it paints instantly, before app.css/app.js load. -->
+    <style>
+      #splash {
+        position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 100;
+        display: -webkit-flex; display: flex; -webkit-flex-direction: column; flex-direction: column;
+        -webkit-align-items: center; align-items: center; -webkit-justify-content: center; justify-content: center;
+        color: #fff; font-family: Roboto, "Segoe UI", sans-serif;
+        background: #12162a;
+        background-image: radial-gradient(circle at 25% 30%, rgba(255, 120, 90, 0.45), rgba(255, 120, 90, 0) 45%),
+          radial-gradient(circle at 80% 75%, rgba(90, 170, 255, 0.45), rgba(90, 170, 255, 0) 45%);
+        transition: opacity 0.6s ease;
+      }
+      #splash.hide { opacity: 0; }
+      .sp-orb { position: relative; width: 150px; height: 150px; }
+      .sp-ring {
+        position: absolute; top: 0; left: 0; width: 150px; height: 150px; border-radius: 50%;
+        border: 2px solid rgba(127, 214, 255, 0.55); opacity: 0;
+        -webkit-animation: sp-pulse 2.4s ease-out infinite; animation: sp-pulse 2.4s ease-out infinite;
+      }
+      .sp-ring.r2 { -webkit-animation-delay: 1.2s; animation-delay: 1.2s; }
+      .sp-core {
+        position: absolute; top: 25px; left: 25px; width: 100px; height: 100px; border-radius: 50%;
+        background: rgba(255, 255, 255, 0.13); border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        display: -webkit-flex; display: flex; -webkit-align-items: center; align-items: center;
+        -webkit-justify-content: center; justify-content: center; color: #9fe0ff;
+      }
+      .sp-core svg { -webkit-animation: sp-spin 1.6s linear infinite; animation: sp-spin 1.6s linear infinite; }
+      .sp-title { margin-top: 30px; font-size: 30px; font-weight: 300; letter-spacing: 6px; text-indent: 6px; }
+      .sp-status { margin-top: 10px; font-size: 14px; color: rgba(255, 255, 255, 0.65); letter-spacing: 0.5px; }
+      .sp-bar { margin-top: 22px; width: 140px; height: 3px; border-radius: 2px; background: rgba(255, 255, 255, 0.15); overflow: hidden; }
+      .sp-bar i {
+        display: block; width: 40%; height: 100%; border-radius: 2px; background: #7fd6ff;
+        -webkit-animation: sp-slide 1.3s ease-in-out infinite; animation: sp-slide 1.3s ease-in-out infinite;
+      }
+      @-webkit-keyframes sp-pulse { 0% { -webkit-transform: scale(0.65); opacity: 0.9; } 100% { -webkit-transform: scale(1.35); opacity: 0; } }
+      @keyframes sp-pulse { 0% { transform: scale(0.65); opacity: 0.9; } 100% { transform: scale(1.35); opacity: 0; } }
+      @-webkit-keyframes sp-spin { to { -webkit-transform: rotate(360deg); } }
+      @keyframes sp-spin { to { transform: rotate(360deg); } }
+      @-webkit-keyframes sp-slide { 0% { -webkit-transform: translateX(-110%); } 100% { -webkit-transform: translateX(260%); } }
+      @keyframes sp-slide { 0% { transform: translateX(-110%); } 100% { transform: translateX(260%); } }
+    </style>
+    <link rel="stylesheet" href="app.css" />
+  </head>
+  <body>
+    <div id="splash">
+      <div class="sp-orb">
+        <div class="sp-ring"></div>
+        <div class="sp-ring r2"></div>
+        <div class="sp-core">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1.6" />
+            <path d="M12 10.4c-.8-3.6.2-6.4 2.6-6.4 2.6 0 2.4 3.9-1 6.4" />
+            <path d="M13.6 12.9c2.7 2.5 3.2 5.4 1.2 6.6-2.3 1.3-4-2.2-2.6-6.1" />
+            <path d="M10.6 12.7c-3.5 1.1-6.4.3-6.6-2-.2-2.6 3.6-2.9 6.6.1" />
+          </svg>
+        </div>
+      </div>
+      <div class="sp-title">HOME</div>
+      <div class="sp-status" id="splash-status">Connecting to Home Assistant…</div>
+      <div class="sp-bar"><i></i></div>
+    </div>
+    <div id="root"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

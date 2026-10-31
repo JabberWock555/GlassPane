@@ -1,0 +1,49 @@
+# Demo configuration for development and screenshots.
+# Pairs with the fake Home Assistant in src/bin/mock_ha.rs:
+#
+#   cargo run --bin mock_ha &
+#   HA_TOKEN=dev cargo run -- demo.toml      # then open http://localhost:8090
+#
+# For your own home, start from glasspane.example.toml instead.
+
+listen = "0.0.0.0:8090"
+ha_url = "ws://127.0.0.1:8124/api/websocket"
+web_dir = "web/dist"
+shopping_list = "todo.shopping_list"
+photos_dir = "demo/photos"
+data_dir = "demo/data"
+
+[[pages]]
+title = "Living Room"
+icon = "sofa"
+tiles = [
+  { entity = "fan.living_room", kind = "fan", name = "Living room fan", light = "light.living_room_fan_light" },
+  { entity = "light.floor_lamp", kind = "light", name = "Floor lamp" },
+  { entity = "switch.living_room_fan_sleep", kind = "switch", name = "Sleep mode", icon = "moon" },
+  { entity = "sensor.living_room_temperature", kind = "sensor", name = "Temperature" },
+]
+
+[[pages]]
+title = "Bedroom"
+icon = "bed"
+tiles = [
+  { entity = "fan.bedroom", kind = "fan", name = "Bedroom fan", light = "light.bedroom_fan_light" },
+  { entity = "light.bedside_lamp", kind = "light", name = "Bedside lamp" },
+  { entity = "switch.bedroom_fan_sleep", kind = "switch", name = "Sleep mode", icon = "moon" },
+]
+
+[[pages]]
+title = "Kitchen"
+icon = "dining"
+tiles = [
+  { entity = "light.kitchen", kind = "light", name = "Lights" },
+  { entity = "switch.coffee_maker", kind = "switch", name = "Coffee maker" },
+  { entity = "sensor.kitchen_humidity", kind = "sensor", name = "Humidity" },
+]
+
+[[pages]]
+title = "Study"
+icon = "home"
+tiles = [
+  { entity = "fan.study", kind = "fan", name = "Study fan", light = "light.study_fan_light" },
+]

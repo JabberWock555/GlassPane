@@ -1,0 +1,1035 @@
+/* glasspane — written for Chrome 57 (Galaxy Tab 3 Lite): CSS grid, CSS
+   variables, transforms. No backdrop-filter, clamp(), aspect-ratio or
+   flexbox gap. Animate only transform/opacity. */
+
+:root {
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.72);
+  --radius: 22px;
+  --on: #ffc46b;            /* warm glow: lights / fan LED */
+  --on-glow: rgba(255, 196, 107, 0.55);
+  --fan: #7fd6ff;           /* cool glow: fans / switches */
+  --fan-glow: rgba(127, 214, 255, 0.45);
+  --gap: 14px;
+  --side-width: 214px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  color: var(--text);
+  font-family: Roboto, "Segoe UI", system-ui, sans-serif;
+  background: #12162a url(/bg.jpg) 0 0 / 100vw 100vh no-repeat;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+#root,
+.app {
+  height: 100%;
+}
+
+.app {
+  display: flex;
+}
+
+/* ---------- glass ---------- */
+
+.glass {
+  /* Position/size are set per element by glass.ts to line up with the page. */
+  background-image: url(/bg-blur.jpg);
+  background-repeat: no-repeat;
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* ---------- sidebar ---------- */
+
+.side {
+  width: var(--side-width);
+  flex-shrink: 0;
+  margin: 14px 0 14px 14px;
+  border-radius: var(--radius);
+  padding: 18px 10px 14px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.side.collapsed {
+  width: 84px;
+  padding: 16px 8px 12px;
+}
+
+.clock {
+  padding: 0 10px 12px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+}
+
+.clock .time {
+  font-size: 38px;
+  font-weight: 300;
+  line-height: 1.05;
+}
+
+.ampm {
+  font-size: 15px;
+  margin-left: 4px;
+  color: var(--muted);
+}
+
+.clock .date {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.clock.compact {
+  padding: 2px 0 12px;
+  text-align: center;
+}
+
+.clock.compact .time {
+  font-size: 19px;
+  font-weight: 400;
+}
+
+/* AQI under the clock */
+.aqi {
+  display: flex;
+  align-items: center;
+  margin-top: 8px;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.aqi-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.aqi-num {
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.aqi-cat {
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aqi-mini {
+  margin-top: 6px;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rooms {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.side-label {
+  margin: 10px 10px 6px;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.collapsed .side-label {
+  height: 1px;
+  margin: 10px 14px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.room {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin: 0 0 4px;
+  padding: 11px 8px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  text-align: left;
+  color: var(--muted);
+  transition: background-color 0.2s;
+}
+
+.collapsed .room {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.room-icon {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.collapsed .room-icon {
+  margin-right: 0;
+}
+
+.dot-badge {
+  position: absolute;
+  top: -6px;
+  right: -9px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: #3fa9e0;
+  color: #fff;
+  font-size: 11px;
+  line-height: 17px;
+  text-align: center;
+}
+
+.room-name {
+  flex: 1;
+  font-size: 15px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.room.active {
+  background: rgba(255, 255, 255, 0.24);
+  color: var(--text);
+}
+
+.count {
+  min-width: 20px;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 11px;
+  background: rgba(127, 214, 255, 0.35);
+  color: #fff;
+  font-size: 12px;
+  text-align: center;
+}
+
+.side-foot {
+  display: flex;
+  align-items: center;
+  padding: 6px 2px 0 10px;
+}
+
+.collapsed .side-foot {
+  flex-direction: column;
+  padding: 6px 0 0;
+}
+
+.link-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6ee7a8;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.collapsed .link-dot {
+  margin: 0 0 8px;
+}
+
+.link-dot.bad {
+  background: #ffb4a8;
+}
+
+.status {
+  flex: 1;
+  font-size: 12px;
+  color: #6ee7a8;
+}
+
+.status.bad {
+  color: #ffb4a8;
+}
+
+.collapse-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- main area ---------- */
+
+.main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.room-view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  -webkit-animation: fadein 0.25s ease-out;
+  animation: fadein 0.25s ease-out;
+}
+
+.main-head {
+  display: flex;
+  align-items: center;
+  margin: 0 0 10px 4px;
+  height: 44px;
+}
+
+.room-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+.room-sub {
+  margin-left: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.round-btn.gear {
+  margin-left: auto;
+  width: 44px;
+  height: 44px;
+}
+
+.grid {
+  flex: 1;
+  min-height: 0; /* rows stay half-height; long lists scroll inside their tile */
+  display: grid;
+  /* 4 x 2 cells; a fan tile spans 2 columns. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  grid-gap: var(--gap);
+}
+
+.wide {
+  grid-column: span 2;
+}
+
+/* ---------- tiles ---------- */
+
+.tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  padding: 18px;
+  color: var(--text);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Readability layer over the blurred image. */
+.tile::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.04));
+}
+
+/* "On" glow, faded in with opacity (cheap on old GPUs). */
+.tile::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: radial-gradient(circle at 25% 20%, var(--on-glow), rgba(255, 196, 107, 0) 70%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tile > * {
+  position: relative;
+  z-index: 1;
+}
+
+.tile.on::after {
+  opacity: 1;
+}
+
+.tile.switch.on::after,
+.fan-tile.on::after {
+  background: radial-gradient(circle at 30% 45%, var(--fan-glow), rgba(127, 214, 255, 0) 70%);
+}
+
+.tile .icon {
+  color: var(--muted);
+  transition: color 0.25s;
+}
+
+.tile.light.on .icon {
+  color: var(--on);
+}
+
+.tile.switch.on .icon {
+  color: var(--fan);
+}
+
+.tile .name {
+  font-size: 17px;
+  font-weight: 500;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tile .detail {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.toggle {
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+
+.toggle:active {
+  -webkit-transform: scale(0.96);
+  transform: scale(0.96);
+}
+
+.pending .icon,
+.round-btn.pending,
+.fan-detail.pending {
+  -webkit-animation: pulse 0.9s ease-in-out infinite;
+  animation: pulse 0.9s ease-in-out infinite;
+}
+
+.off-line {
+  opacity: 0.5;
+}
+
+.sensor .value {
+  font-size: 40px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.sensor .unit {
+  font-size: 18px;
+  margin-left: 4px;
+  color: var(--muted);
+}
+
+/* ---------- fan tile ---------- */
+
+.fan-tile {
+  padding: 14px 20px 12px;
+}
+
+.fan-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.round-btn {
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s, background-color 0.25s, color 0.25s;
+}
+
+.round-btn:active {
+  -webkit-transform: scale(0.9);
+  transform: scale(0.9);
+}
+
+.round-btn.led.on {
+  background: rgba(255, 196, 107, 0.38);
+  border-color: rgba(255, 214, 150, 0.8);
+  color: #fff3d6;
+  box-shadow: 0 0 18px rgba(255, 196, 107, 0.6);
+}
+
+.round-btn.power.on {
+  background: rgba(127, 214, 255, 0.32);
+  border-color: rgba(170, 228, 255, 0.8);
+  color: #e6f7ff;
+}
+
+.fan-mid {
+  display: flex;
+  align-items: center;
+}
+
+.fan-spin {
+  width: 54px;
+  height: 54px;
+  margin-right: 16px;
+  color: var(--muted);
+  transition: color 0.25s;
+}
+
+.fan-spin svg {
+  display: block;
+}
+
+.fan-spin.running {
+  color: var(--fan);
+  -webkit-animation: spin linear infinite;
+  animation: spin linear infinite;
+}
+
+.fan-name {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.fan-detail {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Speed slider: big touch target, thin visual track. */
+/* Bigger fan controls; the tile itself stays the same size. */
+.fan-top .round-btn {
+  width: 60px;
+  height: 60px;
+}
+
+.slider {
+  position: relative;
+  height: 50px;
+  margin: 0 18px;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.track {
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  top: 17px;
+  height: 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.22);
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #6cc8ff, #c4f1ff);
+}
+
+.tick {
+  position: absolute;
+  top: 23px;
+  width: 4px;
+  height: 4px;
+  margin-left: -2px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.tick.lit {
+  background: rgba(18, 40, 70, 0.45);
+}
+
+.thumb {
+  position: absolute;
+  top: 7px;
+  width: 36px;
+  height: 36px;
+  margin-left: -18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin: -6px 4px 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---------- shopping list (to-do) tile ---------- */
+
+.tall {
+  grid-row: span 2;
+}
+
+.todo-tile {
+  padding: 14px 16px 12px;
+  justify-content: flex-start;
+}
+
+.todo-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.todo-icon {
+  color: #ffd38a;
+  margin-right: 10px;
+  display: flex;
+}
+
+.todo-title {
+  flex: 1;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.todo-count {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.todo-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -6px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 9px 6px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: transparent;
+  text-align: left;
+}
+
+.todo-item .box {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-right: 12px;
+  border-radius: 7px;
+  border: 2px solid rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.todo-item .label {
+  font-size: 17px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.todo-item.done .box {
+  background: rgba(127, 214, 255, 0.55);
+  border-color: rgba(170, 228, 255, 0.9);
+}
+
+.todo-item.done .label {
+  color: rgba(255, 255, 255, 0.5);
+  text-decoration: line-through;
+}
+
+.todo-empty {
+  padding: 18px 6px;
+  color: var(--muted);
+}
+
+.todo-add {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.todo-add input {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 21px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.todo-add input::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.round-btn.add {
+  width: 42px;
+  height: 42px;
+  margin-left: 8px;
+  color: #fff;
+  background: rgba(127, 214, 255, 0.35);
+}
+
+.round-btn.add:disabled {
+  opacity: 0.45;
+}
+
+.todo-add .clear {
+  margin-left: 8px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 21px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.empty {
+  margin: 80px auto;
+  color: var(--muted);
+}
+
+/* ---------- settings ---------- */
+
+.settings-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  background: rgba(8, 10, 24, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-animation: fadein 0.2s ease-out;
+  animation: fadein 0.2s ease-out;
+}
+
+/* Opaque panel: a blur behind would need backdrop-filter (Chrome 76+). */
+.glass-solid {
+  background: linear-gradient(160deg, rgba(56, 62, 98, 0.97), rgba(28, 32, 58, 0.97));
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.settings {
+  width: 720px;
+  max-width: 94vw;
+  height: 90vh;
+  border-radius: 26px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.settings-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 10px 26px;
+}
+
+.settings-head h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.settings-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 26px 22px;
+}
+
+.settings section {
+  margin-bottom: 18px;
+}
+
+.settings h3 {
+  margin: 10px 0 6px;
+  font-size: 13px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 500;
+}
+
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.set-text {
+  min-width: 0;
+  margin-right: 16px;
+}
+
+.set-label {
+  font-size: 17px;
+}
+
+.set-hint {
+  margin-top: 3px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.toggle-sw {
+  position: relative;
+  flex-shrink: 0;
+  width: 58px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background-color 0.2s;
+}
+
+.toggle-sw .knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.toggle-sw.on {
+  background: #3fa9e0;
+}
+
+.toggle-sw.on .knob {
+  -webkit-transform: translateX(24px);
+  transform: translateX(24px);
+}
+
+.choice {
+  display: flex;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.choice button {
+  min-width: 58px;
+  height: 38px;
+  padding: 0 10px;
+  border: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.choice button:first-child {
+  border-left: 0;
+}
+
+.choice button.sel {
+  background: rgba(63, 169, 224, 0.75);
+  color: #fff;
+}
+
+.pill-btn {
+  margin-top: 12px;
+  height: 42px;
+  padding: 0 20px;
+  border-radius: 21px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 15px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 150px 1fr;
+  grid-row-gap: 10px;
+  padding: 8px 0 10px;
+  font-size: 15px;
+}
+
+.info-grid > span:nth-child(odd) {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.info-grid .ok {
+  color: #6ee7a8;
+}
+
+.info-grid .bad {
+  color: #ffb4a8;
+}
+
+/* ---------- screensaver ---------- */
+
+.saver {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 40;
+  background: #000;
+  overflow: hidden;
+  -webkit-animation: fadein 0.8s ease-out;
+  animation: fadein 0.8s ease-out;
+}
+
+.saver-slide {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 1.6s ease-in-out;
+}
+
+.saver-slide.show {
+  opacity: 1;
+}
+
+.saver-img,
+.saver-fill {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+/* Slow "Ken Burns" zoom — transform only. */
+.saver-img {
+  -webkit-animation: kenburns 24s ease-out both;
+  animation: kenburns 24s ease-out both;
+}
+
+/* Portrait photos: shown whole over a darkened, scaled copy of themselves. */
+.saver-img.contain {
+  background-size: contain;
+}
+
+.saver-fill {
+  opacity: 0.55;
+}
+
+.saver-clock {
+  position: absolute;
+  left: 44px;
+  bottom: 36px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+}
+
+.saver-time {
+  font-size: 92px;
+  font-weight: 200;
+  line-height: 1;
+}
+
+.saver-time .ampm {
+  font-size: 26px;
+}
+
+.saver-date {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 300;
+}
+
+.saver-aqi {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+.saver-empty {
+  position: absolute;
+  top: 40%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@-webkit-keyframes kenburns { from { -webkit-transform: scale(1); } to { -webkit-transform: scale(1.08) translate(-1%, -1%); } }
+@keyframes kenburns { from { transform: scale(1); } to { transform: scale(1.08) translate(-1%, -1%); } }
+
+/* ---------- animations ---------- */
+
+@-webkit-keyframes pulse { 50% { opacity: 0.35; } }
+@keyframes pulse { 50% { opacity: 0.35; } }
+
+@-webkit-keyframes spin { to { -webkit-transform: rotate(360deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@-webkit-keyframes fadein { from { opacity: 0; } }
+@keyframes fadein { from { opacity: 0; } }

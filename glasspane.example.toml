@@ -1,0 +1,38 @@
+# glasspane configuration — copy to glasspane.toml and edit.
+#
+# Find your entity IDs in Home Assistant: Settings → Devices & services →
+# Entities. The Home Assistant token is NOT stored here: put a long-lived
+# access token (HA → your profile → Security) in the HA_TOKEN environment
+# variable. See docs/CONFIGURATION.md for every option.
+
+listen = "0.0.0.0:8090"                       # open http://<server-ip>:8090 on the tablet
+ha_url = "ws://127.0.0.1:8123/api/websocket"  # HA on the same machine
+web_dir = "web/dist"
+
+# Optional extras
+shopping_list = "todo.shopping_list"          # enables the Shopping section + Home widget
+photos_dir = "/sdcard/Pictures/Glasspane"     # screensaver photos (Termux path shown)
+# data_dir = "."                              # where settings.json / usage.json live
+# background = "wallpaper.jpg"                # your own wallpaper (a gradient otherwise)
+# blur_sigma = 22.0                           # frosted-glass strength
+# aqi_location = [52.37, 4.90]                # override HA's home location for AQI
+
+# Each [[pages]] entry is a room in the sidebar (4 x 2 grid; fans are 2 wide).
+[[pages]]
+title = "Living Room"
+icon = "sofa"                                 # home, dining, sofa, bed, fan, cart
+tiles = [
+  # A fan with its built-in light shown as a button on the tile:
+  { entity = "fan.living_room", kind = "fan", name = "Ceiling fan", light = "light.living_room_fan_light" },
+  { entity = "light.floor_lamp", kind = "light" },
+  { entity = "switch.living_room_fan_sleep", kind = "switch", name = "Sleep mode", icon = "moon" },
+  { entity = "sensor.living_room_temperature", kind = "sensor" },
+]
+
+[[pages]]
+title = "Bedroom"
+icon = "bed"
+tiles = [
+  { entity = "fan.bedroom", kind = "fan", name = "Ceiling fan", light = "light.bedroom_fan_light" },
+  { entity = "light.bedside_lamp", kind = "light" },
+]

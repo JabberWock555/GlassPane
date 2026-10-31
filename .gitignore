@@ -1,0 +1,16 @@
+# Build output
+/target
+/web/node_modules
+# web/dist IS committed: phones can run the server without installing Node.
+
+# Your own config (holds your entity ids) — start from glasspane.example.toml
+/glasspane.toml
+
+# Runtime data written by the server
+settings.json
+usage.json
+.photo-cache/
+/demo/data/
+
+# Scratch
+*.tmp.mjs
