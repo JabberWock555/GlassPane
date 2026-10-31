@@ -1,0 +1,25 @@
+name: Release
+
+# Push a tag like v0.2.0 to publish a GitHub release. The attached zip has a
+# top-level glasspane/ folder, the format scripts/update-termux.sh expects:
+#   bash ~/glasspane/scripts/update-termux.sh glasspane-v0.2.0.zip
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Package source + prebuilt frontend
+        run: |
+          mkdir -p out
+          git archive --format=zip --prefix=glasspane/ -o "out/glasspane-${GITHUB_REF_NAME}.zip" HEAD
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: out/*.zip
+          generate_release_notes: true
