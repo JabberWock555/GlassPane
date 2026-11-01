@@ -1,11 +1,17 @@
 name: Release
 
-# Push a tag like v0.2.0 to publish a GitHub release. The attached zip has a
-# top-level glasspane/ folder, the format scripts/update-termux.sh expects:
+# Publishes a GitHub release whenever the version in Cargo.toml changes on
+# main: bump `version`, add a section to CHANGELOG.md, push. If the tag
+# v<version> already exists, nothing happens.
+#
+# The attached zip has a top-level glasspane/ folder, the format
+# scripts/update-termux.sh expects:
 #   bash ~/glasspane/scripts/update-termux.sh glasspane-v0.2.0.zip
 on:
   push:
-    tags: ["v*"]
+    branches: [main]
+    paths: [Cargo.toml, .github/workflows/release.yml]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -15,11 +21,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Read version
+        id: v
+        run: |
+          ver=$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)
+          echo "tag=v$ver" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$ver" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Package source + prebuilt frontend
+        if: steps.v.outputs.exists != 'true'
         run: |
           mkdir -p out
-          git archive --format=zip --prefix=glasspane/ -o "out/glasspane-${GITHUB_REF_NAME}.zip" HEAD
+          git archive --format=zip --prefix=glasspane/ -o "out/glasspane-${{ steps.v.outputs.tag }}.zip" HEAD
+          # Release notes = this version's section of CHANGELOG.md.
+          awk -v v="## ${{ steps.v.outputs.tag }}" 'BEGIN{sub(/^## v/,"## ",v)} $0==v{on=1;next} /^## /{on=0} on' CHANGELOG.md > out/notes.md
       - uses: softprops/action-gh-release@v2
+        if: steps.v.outputs.exists != 'true'
         with:
+          tag_name: ${{ steps.v.outputs.tag }}
+          name: glasspane ${{ steps.v.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          body_path: out/notes.md
           files: out/*.zip
-          generate_release_notes: true

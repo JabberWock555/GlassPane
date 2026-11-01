@@ -118,3 +118,12 @@ docs/              documentation + screenshots
 
 Set `RUST_LOG=glasspane=debug` to see every message exchanged with Home
 Assistant and every rejected client command.
+
+## Releasing
+
+1. Bump `version` in `Cargo.toml` (and `web/package.json`).
+2. Add a `## <version>` section at the top of `CHANGELOG.md`.
+3. Push to `main`. The Release workflow sees the new version, tags
+   `v<version>`, and publishes a GitHub release. The release notes come from
+   the changelog, and a zip is attached that `scripts/update-termux.sh`
+   can install.
